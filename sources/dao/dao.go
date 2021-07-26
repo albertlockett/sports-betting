@@ -1,11 +1,18 @@
 package dao
 
 import (
+  "context"
   "encoding/json"
+  "errors"
+  "fmt"
+  "github.com/albertlockett/sports-betting/sources/model"
   "github.com/elastic/go-elasticsearch/v7"
+  "github.com/elastic/go-elasticsearch/v7/esapi"
   "log"
   "strings"
 )
+
+const IDX_EVENT = "events"
 
 type dao struct {
   client *elasticsearch.Client
@@ -35,6 +42,7 @@ func Init() error {
 }
 
 func testConnection() error {
+  log.Println("Testing database connection")
   res, err := local.client.Info()
   if err != nil {
     log.Fatalf("Error getting response: %s", err)
@@ -52,7 +60,33 @@ func testConnection() error {
   // Print client and server version numbers.
   log.Printf("Client: %s", elasticsearch.Version)
   log.Printf("Server: %s", r["version"].(map[string]interface{})["number"])
-  log.Println(strings.Repeat("~", 37))
+  log.Println("Connection success")
+
+  return nil
+}
+
+func SaveEvent(event *model.Event) error {
+  bytes, err := json.Marshal(event);
+  if err != nil {
+    return err
+  }
+
+  req := esapi.IndexRequest{
+    Index: IDX_EVENT,
+    Body: strings.NewReader(string(bytes)),
+  }
+
+  res, err := req.Do(context.Background(), local.client)
+  if err != nil {
+    return err
+  }
+  defer res.Body.Close()
+
+  if res.IsError() {
+    errMsg := fmt.Sprintf("[%s] Error indexing document", res.Status())
+    err = errors.New(errMsg)
+    return err
+  }
 
   return nil
 }
