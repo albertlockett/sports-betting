@@ -4,12 +4,14 @@ import (
   "encoding/csv"
   "github.com/albertlockett/sports-betting/sources/model"
   "net/http"
+  "strconv"
   "time"
 )
 
 const FILE_URL = "https://projects.fivethirtyeight.com/mlb-api/mlb_elo_latest.csv"
+const SOURCE = "fivethirtyeight.com"
 
-func FetchEvents() ([]*model.Event, error) {
+func FetchEvents() ([]*model.Handicap, error) {
   data, err := readFromCsv()
   if err != nil {
     return nil, err
@@ -41,11 +43,12 @@ func readFromCsv() ([][]string, error) {
   return data, nil
 }
 
-func unmarshalCsvData(data [][]string) ([]*model.Event, error) {
+func unmarshalCsvData(data [][]string) ([]*model.Handicap, error) {
   layout := "2006-01-02"
-  today := time.Now().Format(layout)
+  now := time.Now()
+  today := now.Format(layout)
 
-  results := make([]*model.Event, 0)
+  results := make([]*model.Handicap, 0)
   for i, row := range(data) {
     if i == 0 {
       continue // skip header
@@ -67,7 +70,32 @@ func unmarshalCsvData(data [][]string) ([]*model.Event, error) {
       AwayTeam: row[5],
       Time: gameTime,
     }
-    results = append(results, &event)
+
+    homeOdds, err := strconv.ParseFloat(row[8], 64)
+    if err != nil {
+      return nil, err
+    }
+    awayOdds, err := strconv.ParseFloat(row[9], 64)
+    if err != nil {
+      return nil, err
+    }
+
+    results = append(results, &model.Handicap{
+      Event: event,
+      Source: SOURCE,
+      LatestCollected: true,
+      TimeCollected: now,
+      Odds: homeOdds,
+      Side: model.SIDE_HOME,
+    })
+    results = append(results, &model.Handicap{
+      Event: event,
+      Source: SOURCE,
+      LatestCollected: true,
+      TimeCollected: now,
+      Odds: awayOdds,
+      Side: model.SIDE_AWAY,
+    })
   }
 
   return results, nil

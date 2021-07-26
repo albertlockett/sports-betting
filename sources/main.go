@@ -13,17 +13,17 @@ func main() {
 		panic(err)
 	}
 
-	events, err := fivethirtyeight.FetchEvents()
+	handicaps, err := fivethirtyeight.FetchEvents()
 
 	if err != nil {
 		log.Println("an error happened")
 		panic(err)
 	}
 
-	log.Println(fmt.Sprintf("There were %d events", len(events)))
+	log.Println(fmt.Sprintf("There were %d events", len(handicaps) / 2))
 	log.Println("Saving events")
 
-	for _, event := range events {
-		dao.SaveEvent(event)
+	for _, handicap := range handicaps {
+		dao.SaveHandicap(handicap)
 	}
 }

@@ -12,7 +12,7 @@ import (
   "strings"
 )
 
-const IDX_EVENT = "events"
+const IDX_HANDICAP = "handicaps"
 
 type dao struct {
   client *elasticsearch.Client
@@ -65,14 +65,15 @@ func testConnection() error {
   return nil
 }
 
-func SaveEvent(event *model.Event) error {
-  bytes, err := json.Marshal(event);
+func SaveHandicap(handicap *model.Handicap) error {
+  bytes, err := json.Marshal(handicap);
   if err != nil {
     return err
   }
 
   req := esapi.IndexRequest{
-    Index: IDX_EVENT,
+    Index: IDX_HANDICAP,
+    DocumentID: handicap.ComputeId(),
     Body: strings.NewReader(string(bytes)),
   }
 
