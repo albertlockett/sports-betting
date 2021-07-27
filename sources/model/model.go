@@ -46,3 +46,10 @@ type Line struct {
   Source          string
   Type            string
 }
+
+func (l Line) ComputeId() string {
+  stringVal := fmt.Sprintf("%s%s%s%s%s", l.Side, l.HomeTeam, l.AwayTeam, l.Time.Format(time.RFC3339), l.TimeCollected.Format(time.RFC3339))
+  hasher := sha1.New()
+  hasher.Write([]byte(stringVal))
+  return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}

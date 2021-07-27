@@ -6,7 +6,6 @@ import (
   "github.com/albertlockett/sports-betting/sources/model"
   "io"
   "io/ioutil"
-  "log"
   "net/http"
   "net/url"
   "strings"
@@ -16,6 +15,47 @@ import (
 const _SOURCE = "betdsi.com"
 const _URL_AUTH_CUSTOMER = "https://retro-ii.betdsi.eu/cloud/api/System/authenticateCustomer"
 const _URL_GET_LEAGUE_LINES = "https://retro-ii.betdsi.eu/cloud/api/Lines/Get_LeagueLines"
+
+var teamCodes = map[string]string {
+  // AL East
+  "Baltimore Orioles": "BAL",
+  "Boston Red Sox": "BOS",
+  "New York Yankees": "NYY",
+  "Tampa Bay Rays": "TB",
+  "Toronto Blue Jays": "TOR",
+  // AL Central
+  "Chicago White Sox": "CSW",
+  "Cleveland Indians": "CLE",
+  "Cleveland Guardians": "CLE",
+  "Detroit Tigers": "DET",
+  "Kansas City Royals": "KCR",
+  "Minnesota Twins": "MIN",
+  // AL West
+  "Houston Astros": "HOU",
+  "Los Angeles Angels": "LAA",
+  "Oakland Athletics": "OAK",
+  "Seattle Mariners": "SEA",
+  "Texas Rangers": "TEX",
+  // NL East
+  "Atlanta Braves": "ATL",
+  "Miami Marlins": "MIA",
+  "New York Mets": "NYM",
+  "Philadelphia Phillies": "PHI",
+  "Washington Nationals": "WAS",
+  // NL Central
+  "Chicago Cubs": "CHC",
+  "Cincinnati Reds": "CIN",
+  "Milwaukee Brewers": "MIL",
+  "Pittsburgh Pirates": "PIT",
+  "St. Louis Cardinals": "STL",
+  "St Louis Cardinals": "STL",
+  // NL West
+  "Arizona Diamondbacks": "ARZ",
+  "Colorado Rockies": "COL",
+  "Los Angeles Dodgers": "LAD",
+  "San Diego Padres": "SD",
+  "San Francisco Giants": "SFG",
+}
 
 type _AuthCustomerResp struct {
   Code string
@@ -63,9 +103,7 @@ func getAuthToken() (string, error) {
 
   defer resp.Body.Close()
   // TODO check status should be 200
-
   body, err := io.ReadAll(resp.Body)
-  log.Printf("Body %d %s", len(body), string(body))
 
   data := _AuthCustomerResp{}
   err = json.Unmarshal(body, &data)
@@ -77,7 +115,6 @@ func getAuthToken() (string, error) {
 }
 
 func getLines2(token string) ([]*model.Line, error) {
-  log.Println(token)
   method := "POST"
   payload := strings.NewReader(fmt.Sprintf(`customerID=DSI193788+&operation=Get_LeagueLines&sportType=BASEBALL&sportSubType=MLB&period=Game&hourFilter=0&propDescription=Game&wagerType=Straight&keyword=&office=DSIMA&correlationID=&periodNumber=0&grouping=&periods=0&rotOrder=0&placeLateFlag=false&RRO=1&access_token=%s`, token))
   client := &http.Client{}
@@ -99,7 +136,6 @@ func getLines2(token string) ([]*model.Line, error) {
   if err != nil {
     return nil, err
   }
-  fmt.Println(string(body))
 
   data := _GetLeagueLinesResp{}
   err = json.Unmarshal(body, &data)
@@ -118,8 +154,8 @@ func getLines2(token string) ([]*model.Line, error) {
       return nil, err
     }
     event := model.Event{
-      HomeTeam: line.Team1ID,
-      AwayTeam: line.Team2ID,
+      HomeTeam: teamCodes[line.Team1ID],
+      AwayTeam: teamCodes[line.Team2ID],
       Time: eventTime,
     }
     results = append(results, &model.Line{

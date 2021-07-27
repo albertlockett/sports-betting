@@ -13,6 +13,7 @@ import (
 )
 
 const IDX_HANDICAP = "handicaps"
+const IDX_LINES = "lines"
 
 type dao struct {
   client *elasticsearch.Client
@@ -25,6 +26,7 @@ func Init() error {
     Addresses: []string{
       "http://localhost:9200",
     },
+    //Transport: &LoggingTransport{},
   }
   es, err := elasticsearch.NewClient(config)
   if err != nil {
@@ -66,15 +68,26 @@ func testConnection() error {
 }
 
 func SaveHandicap(handicap *model.Handicap) error {
-  bytes, err := json.Marshal(handicap);
+  document, err := json.Marshal(handicap);
   if err != nil {
     return err
   }
+  return saveRecord(IDX_HANDICAP, handicap.ComputeId(), document)
+}
 
+func SaveLine(line *model.Line) error {
+  document, err := json.Marshal(line);
+  if err != nil {
+    return err
+  }
+  return saveRecord(IDX_LINES, line.ComputeId(), document)
+}
+
+func saveRecord(index string, id string, document []byte) error {
   req := esapi.IndexRequest{
-    Index: IDX_HANDICAP,
-    DocumentID: handicap.ComputeId(),
-    Body: strings.NewReader(string(bytes)),
+    Index: index,
+    DocumentID: id,
+    Body: strings.NewReader(string(document)),
   }
 
   res, err := req.Do(context.Background(), local.client)
@@ -91,3 +104,45 @@ func SaveHandicap(handicap *model.Handicap) error {
 
   return nil
 }
+
+
+func ResetLineLatestCollected() error {
+  return resetLatestCollectedFlag(IDX_LINES)
+}
+
+func ResetHandicapLatestCollected() error {
+  return resetLatestCollectedFlag(IDX_HANDICAP)
+}
+
+func resetLatestCollectedFlag(index string) error {
+  req := esapi.UpdateByQueryRequest{
+    Index: []string{index},
+    Body: strings.NewReader(`{
+      "query":{
+        "term":{
+          "LatestCollected":{"value":"true"}
+        }
+      },
+      "script":{
+        "source": "ctx._source.LatestCollected = false",
+        "lang": "painless"
+      }
+    }`),
+  }
+
+  res, err := req.Do(context.Background(), local.client)
+  if err != nil {
+    return err
+  }
+  defer res.Body.Close()
+
+  if res.IsError() {
+    errMsg := fmt.Sprintf("[%s] Error resetting LastCollected document", res.Status())
+    err = errors.New(errMsg)
+    return err
+  }
+
+  return nil
+}
+
+
