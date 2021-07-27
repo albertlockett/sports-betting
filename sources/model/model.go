@@ -10,6 +10,8 @@ import (
 const SIDE_HOME = "home"
 const SIDE_AWAY = "away"
 
+const LINE_TYPE_MONEYLINE = "moneyline"
+
 const _ID_DATE_LAYOUT = "yyyy-MM-dd"
 
 type Event struct {
@@ -32,4 +34,15 @@ func (h Handicap) ComputeId() string {
   hasher := sha1.New()
   hasher.Write([]byte(stringVal))
   return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}
+
+type Line struct {
+  Event
+  TimeCollected   time.Time
+  LatestCollected bool
+  LineAmerican    int32
+  LineDecimal     float64
+  Side            string
+  Source          string
+  Type            string
 }
