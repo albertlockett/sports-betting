@@ -53,3 +53,11 @@ func (l Line) ComputeId() string {
   hasher.Write([]byte(stringVal))
   return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 }
+
+
+type ExpectedValue struct {
+  Event
+  Handicap
+  Line
+  ExpectedValue float64
+}

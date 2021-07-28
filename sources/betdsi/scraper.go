@@ -21,7 +21,7 @@ var teamCodes = map[string]string {
   "Baltimore Orioles": "BAL",
   "Boston Red Sox": "BOS",
   "New York Yankees": "NYY",
-  "Tampa Bay Rays": "TB",
+  "Tampa Bay Rays": "TBD",
   "Toronto Blue Jays": "TOR",
   // AL Central
   "Chicago White Sox": "CSW",
@@ -38,10 +38,10 @@ var teamCodes = map[string]string {
   "Texas Rangers": "TEX",
   // NL East
   "Atlanta Braves": "ATL",
-  "Miami Marlins": "MIA",
+  "Miami Marlins": "FLA",
   "New York Mets": "NYM",
   "Philadelphia Phillies": "PHI",
-  "Washington Nationals": "WAS",
+  "Washington Nationals": "WSN",
   // NL Central
   "Chicago Cubs": "CHC",
   "Cincinnati Reds": "CIN",
@@ -154,8 +154,8 @@ func getLines2(token string) ([]*model.Line, error) {
       return nil, err
     }
     event := model.Event{
-      HomeTeam: teamCodes[line.Team1ID],
-      AwayTeam: teamCodes[line.Team2ID],
+      HomeTeam: teamCodes[line.Team2ID],
+      AwayTeam: teamCodes[line.Team1ID],
       Time: eventTime,
     }
     results = append(results, &model.Line{
@@ -165,8 +165,8 @@ func getLines2(token string) ([]*model.Line, error) {
       LatestCollected: true,
       Type:            model.LINE_TYPE_MONEYLINE,
       Side:            model.SIDE_HOME,
-      LineAmerican:    line.MoneyLine1,
-      LineDecimal:     line.MoneyLineDecimal1,
+      LineAmerican:    line.MoneyLine2,
+      LineDecimal:     line.MoneyLineDecimal2,
     })
     results = append(results, &model.Line{
       Event:           event,
@@ -175,8 +175,8 @@ func getLines2(token string) ([]*model.Line, error) {
       LatestCollected: true,
       Type:            model.LINE_TYPE_MONEYLINE,
       Side:            model.SIDE_AWAY,
-      LineAmerican:    line.MoneyLine2,
-      LineDecimal:     line.MoneyLineDecimal2,
+      LineAmerican:    line.MoneyLine1,
+      LineDecimal:     line.MoneyLineDecimal1,
     })
   }
 

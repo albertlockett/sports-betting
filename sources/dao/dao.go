@@ -9,6 +9,7 @@ import (
   "github.com/elastic/go-elasticsearch/v7"
   "github.com/elastic/go-elasticsearch/v7/esapi"
   "log"
+  "sort"
   "strings"
 )
 
@@ -26,7 +27,7 @@ func Init() error {
     Addresses: []string{
       "http://localhost:9200",
     },
-    //Transport: &LoggingTransport{},
+    Transport: &LoggingTransport{},
   }
   es, err := elasticsearch.NewClient(config)
   if err != nil {
@@ -55,7 +56,7 @@ func testConnection() error {
     log.Fatalf("Error: %s", res.String())
   }
   // Deserialize the response into a map.
-  var r  map[string]interface{}
+  var r map[string]interface{}
   if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
     log.Fatalf("Error parsing the response body: %s", err)
   }
@@ -68,7 +69,7 @@ func testConnection() error {
 }
 
 func SaveHandicap(handicap *model.Handicap) error {
-  document, err := json.Marshal(handicap);
+  document, err := json.Marshal(handicap)
   if err != nil {
     return err
   }
@@ -76,7 +77,7 @@ func SaveHandicap(handicap *model.Handicap) error {
 }
 
 func SaveLine(line *model.Line) error {
-  document, err := json.Marshal(line);
+  document, err := json.Marshal(line)
   if err != nil {
     return err
   }
@@ -85,9 +86,9 @@ func SaveLine(line *model.Line) error {
 
 func saveRecord(index string, id string, document []byte) error {
   req := esapi.IndexRequest{
-    Index: index,
+    Index:      index,
     DocumentID: id,
-    Body: strings.NewReader(string(document)),
+    Body:       strings.NewReader(string(document)),
   }
 
   res, err := req.Do(context.Background(), local.client)
@@ -105,7 +106,6 @@ func saveRecord(index string, id string, document []byte) error {
   return nil
 }
 
-
 func ResetLineLatestCollected() error {
   return resetLatestCollectedFlag(IDX_LINES)
 }
@@ -118,6 +118,7 @@ func resetLatestCollectedFlag(index string) error {
   req := esapi.UpdateByQueryRequest{
     Index: []string{index},
     Body: strings.NewReader(`{
+      "size": 1000,
       "query":{
         "term":{
           "LatestCollected":{"value":"true"}
@@ -145,4 +146,109 @@ func resetLatestCollectedFlag(index string) error {
   return nil
 }
 
+type fetchHandicapsResult struct {
+  Hits struct {
+    Hits []struct {
+      Source model.Handicap `json:"_source"`
+    }
+  }
+}
 
+type fetchLinesResult struct {
+  Hits struct {
+    Hits []struct {
+      Source model.Line `json:"_source"`
+    }
+  }
+}
+
+func FetchEvents() ([]*model.ExpectedValue, error) {
+  // TODO make times the same aka today
+
+  req := esapi.SearchRequest{
+    Index: []string{IDX_HANDICAP},
+
+    //
+    Body: strings.NewReader(`{
+      "size": 1000,
+      "query": {
+        "bool": {
+          "must": [
+            { "term": { "LatestCollected":{"value":"true"} } }
+          ]
+        }
+      }
+    }`),
+  }
+
+  res, err := req.Do(context.Background(), local.client)
+  if err != nil {
+    return nil, err
+  }
+  defer res.Body.Close()
+
+  resBody := &fetchHandicapsResult{}
+  if err := json.NewDecoder(res.Body).Decode(&resBody); err != nil {
+    log.Fatalf("Error parsing the response body: %s", err)
+  }
+
+  if err != nil {
+    return nil, err
+  }
+
+  handicaps := make([]*model.Handicap, 0)
+  for _, result := range resBody.Hits.Hits {
+    handicaps = append(handicaps, &result.Source)
+  }
+
+  results := make([]*model.ExpectedValue, 0)
+
+  for _, hit := range resBody.Hits.Hits {
+    handicap := hit.Source
+    query := fmt.Sprintf(`{
+      "query": {
+        "bool": {
+          "must": [
+            { "term": { "LatestCollected" : { "value": "true" } } },
+            { "term": { "HomeTeam.keyword": { "value":"%s" } } },
+            { "term": { "AwayTeam.keyword": { "value": "%s" } } },
+            { "term": { "Side": { "value": "%s" } } }
+          ]
+        }
+      }
+    }`, handicap.HomeTeam, handicap.AwayTeam, handicap.Side)
+    fmt.Println(query)
+
+    req := esapi.SearchRequest{
+      Index: []string{IDX_LINES},
+      Body: strings.NewReader(query),
+    }
+    res, err := req.Do(context.Background(), local.client)
+    if err != nil {
+      return nil, err
+    }
+    defer res.Body.Close()
+
+    resBody := &fetchLinesResult{}
+    if err := json.NewDecoder(res.Body).Decode(&resBody); err != nil {
+      log.Fatalf("Error parsing the response body: %s", err)
+    }
+
+    for _, hit := range resBody.Hits.Hits {
+      line := hit.Source
+      ev := model.ExpectedValue{
+        Event: line.Event,
+        Line: line,
+        Handicap: handicap,
+        ExpectedValue: handicap.Odds * line.LineDecimal,
+      }
+      results = append(results, &ev)
+    }
+  }
+
+  sort.Slice(results[:], func(i, j int) bool {
+    return results[i].ExpectedValue > results[j].ExpectedValue
+  })
+
+  return results, nil
+}

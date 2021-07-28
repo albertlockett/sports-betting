@@ -24,9 +24,9 @@ func main() {
 
 	// save lines
 	err = dao.ResetLineLatestCollected()
-	if err != nil {
-		panic(err)
-	}
+	//if err != nil {
+	//	panic(err)
+	//}
 	for _, line := range lines {
 		dao.SaveLine(line)
 	}
@@ -41,9 +41,9 @@ func main() {
 
 	// save handicap data
 	err = dao.ResetHandicapLatestCollected()
-	if err != nil {
-		panic(err)
-	}
+	//if err != nil {
+	//	panic(err)
+	//}
 	for _, handicap := range handicaps {
 		dao.SaveHandicap(handicap)
 	}
