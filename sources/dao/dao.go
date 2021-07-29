@@ -235,7 +235,7 @@ func FetchEvents() ([]*model.ExpectedValue, error) {
 
     req := esapi.SearchRequest{
       Index: []string{IDX_LINES},
-      Body: strings.NewReader(query),
+      Body:  strings.NewReader(query),
     }
     res, err := req.Do(context.Background(), local.client)
     if err != nil {
@@ -251,11 +251,12 @@ func FetchEvents() ([]*model.ExpectedValue, error) {
     for _, hit := range resBody.Hits.Hits {
       line := hit.Source
       ev := model.ExpectedValue{
-        Event: line.Event,
-        Line: line,
-        Handicap: handicap,
+        Event:           line.Event,
+        Line:            line,
+        Handicap:        handicap,
         LatestCollected: true,
-        ExpectedValue: handicap.Odds * line.LineDecimal,
+        Side:            line.Side,
+        ExpectedValue:   handicap.Odds * line.LineDecimal,
       }
       results = append(results, &ev)
     }

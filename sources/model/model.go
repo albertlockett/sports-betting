@@ -54,13 +54,13 @@ func (l Line) ComputeId() string {
   return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 }
 
-
 type ExpectedValue struct {
   Event
   Handicap
   Line
   LatestCollected bool
-  ExpectedValue float64
+  Side            string
+  ExpectedValue   float64
 }
 
 func (e ExpectedValue) ComputeId() string {
