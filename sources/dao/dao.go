@@ -254,6 +254,7 @@ func FetchEvents() ([]*model.ExpectedValue, error) {
         Event: line.Event,
         Line: line,
         Handicap: handicap,
+        LatestCollected: true,
         ExpectedValue: handicap.Odds * line.LineDecimal,
       }
       results = append(results, &ev)

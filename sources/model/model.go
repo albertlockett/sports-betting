@@ -59,6 +59,7 @@ type ExpectedValue struct {
   Event
   Handicap
   Line
+  LatestCollected bool
   ExpectedValue float64
 }
 
