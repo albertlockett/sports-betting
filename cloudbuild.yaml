@@ -1,0 +1,5 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', './sources/Dockerfile', '-t', 'gcr.io/albertlockett-test2/sports-betting:latest', './sources']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/albertlockett-test2/sports-betting:latest']
