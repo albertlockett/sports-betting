@@ -1,0 +1,20 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: lines-scrape
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: handicap-scrape-job
+            image: gcr.io/albertlockett-test2/sports-betting:latest
+            imagePullPolicy: Always
+            args:
+            - lines
+            env:
+            - name: CFG_ES_URL
+              value: http://elasticsearch-master:9200
+          restartPolicy: Never

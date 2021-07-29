@@ -1,0 +1,11 @@
+
+replicas: 2
+minimumMasterNodes: 2
+
+resources:
+  requests:
+    cpu: "200m"
+    memory: "1Gi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"

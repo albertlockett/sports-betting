@@ -32,7 +32,7 @@ var teamCodes = map[string]string {
   "Minnesota Twins": "MIN",
   // AL West
   "Houston Astros": "HOU",
-  "Los Angeles Angels": "LAA",
+  "Los Angeles Angels": "ANA",
   "Oakland Athletics": "OAK",
   "Seattle Mariners": "SEA",
   "Texas Rangers": "TEX",
@@ -53,7 +53,7 @@ var teamCodes = map[string]string {
   "Arizona Diamondbacks": "ARZ",
   "Colorado Rockies": "COL",
   "Los Angeles Dodgers": "LAD",
-  "San Diego Padres": "SD",
+  "San Diego Padres": "SDP",
   "San Francisco Giants": "SFG",
 }
 
