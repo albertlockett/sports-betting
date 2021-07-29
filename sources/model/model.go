@@ -61,3 +61,10 @@ type ExpectedValue struct {
   Line
   ExpectedValue float64
 }
+
+func (e ExpectedValue) ComputeId() string {
+  stringVal := fmt.Sprintf("%s%s%s%s%s%s", e.Line.Side, e.HomeTeam, e.AwayTeam, e.Time.Format(time.RFC3339), e.Handicap.TimeCollected.Format(time.RFC3339), e.Line.TimeCollected.Format(time.RFC3339))
+  hasher := sha1.New()
+  hasher.Write([]byte(stringVal))
+  return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}

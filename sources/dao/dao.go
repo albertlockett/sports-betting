@@ -5,6 +5,7 @@ import (
   "encoding/json"
   "errors"
   "fmt"
+  config2 "github.com/albertlockett/sports-betting/sources/config"
   "github.com/albertlockett/sports-betting/sources/model"
   "github.com/elastic/go-elasticsearch/v7"
   "github.com/elastic/go-elasticsearch/v7/esapi"
@@ -15,6 +16,7 @@ import (
 
 const IDX_HANDICAP = "handicaps"
 const IDX_LINES = "lines"
+const IDX_EXPECTED_VALUES = "expected-values"
 
 type dao struct {
   client *elasticsearch.Client
@@ -25,7 +27,7 @@ var local = dao{}
 func Init() error {
   config := elasticsearch.Config{
     Addresses: []string{
-      "http://localhost:9200",
+      config2.Local.EsUrl,
     },
     Transport: &LoggingTransport{},
   }
@@ -66,6 +68,14 @@ func testConnection() error {
   log.Println("Connection success")
 
   return nil
+}
+
+func SaveExpectedValue(ev *model.ExpectedValue) error {
+  document, err := json.Marshal(ev)
+  if err != nil {
+    return err
+  }
+  return saveRecord(IDX_EXPECTED_VALUES, ev.ComputeId(), document)
 }
 
 func SaveHandicap(handicap *model.Handicap) error {
@@ -112,6 +122,10 @@ func ResetLineLatestCollected() error {
 
 func ResetHandicapLatestCollected() error {
   return resetLatestCollectedFlag(IDX_HANDICAP)
+}
+
+func ResetExpectedValueLatestCollected() error {
+  return resetLatestCollectedFlag(IDX_EXPECTED_VALUES)
 }
 
 func resetLatestCollectedFlag(index string) error {
