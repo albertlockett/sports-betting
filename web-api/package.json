@@ -1,0 +1,39 @@
+{
+  "name": "sports-betting-web-api",
+  "version": "1.0.0",
+  "description": "## build It's build using GCP cloud build",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf ./build && tsc",
+    "lint": "eslint . --ext .ts",
+    "start:dev": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/albertlockett/sports-betting.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/albertlockett/sports-betting/issues"
+  },
+  "homepage": "https://github.com/albertlockett/sports-betting#readme",
+  "devDependencies": {
+    "@types/node": "16.4.10",
+    "@typescript-eslint/eslint-plugin": "4.28.5",
+    "@typescript-eslint/parser": "4.28.5",
+    "eslint": "7.32.0",
+    "eslint-plugin-prettier": "3.4.0",
+    "nodemon": "2.0.12",
+    "prettier": "2.3.2",
+    "rimraf": "3.0.2",
+    "ts-node": "10.1.0",
+    "typescript": "4.3.5"
+  },
+  "dependencies": {
+    "apollo-server-express": "3.1.1",
+    "express": "4.17.1",
+    "graphql": "15.5.1"
+  }
+}
