@@ -1,4 +1,9 @@
 import express = require("express");
+import cors from "cors";
+import { GraphQLSchema, GraphQLObjectType } from "graphql";
+import elasticsearch from "elasticsearch";
+import { elasticApiFieldConfig } from "graphql-compose-elasticsearch";
+
 import { ApolloServer, gql } from "apollo-server-express";
 
 async function start() {
@@ -16,10 +21,26 @@ async function start() {
     },
   };
 
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const schema = new GraphQLSchema({
+    query: new GraphQLObjectType({
+      name: "Query",
+      fields: {
+        elastic7: elasticApiFieldConfig(
+          // you may provide existed Elastic Client instance
+          new elasticsearch.Client({
+            host: "http://localhost:9200",
+            apiVersion: "7.x",
+          })
+        ),
+      },
+    }),
+  });
+
+  const server = new ApolloServer({ typeDefs, resolvers, schema });
   await server.start();
 
   const app = express();
+  app.use(cors())
   server.applyMiddleware({ app });
 
   const staticPath = __dirname + "/../static";

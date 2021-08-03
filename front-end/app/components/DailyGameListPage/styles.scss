@@ -1,0 +1,66 @@
+@import "../../theme.scss";
+
+.daily-game-list {
+  .game-item {
+    background: white;
+    margin: 8px;
+    padding: 8px;
+
+    display: grid;
+    grid-template-columns: 15% 30% auto 30% 13%;
+    // & > div {
+    //   border: 1px solid red;
+    // }
+
+    .at-sign {
+      font-family: $font-family-nhg-disp;
+      font-weight: $font-weight-nhg-disp-36-extra-light-it;
+      font-size: 18px;
+      font-style: italic;
+      text-align: center;
+    }
+
+    .game-item-numbers {
+      &.home {
+        text-align: right;
+      }
+      .value {
+        font-family: $font-family-ocr;
+      }
+
+      .ev-number { 
+        &.positive {
+          color: #80DF8D;
+        }
+        &.negative {
+          color: #F08C8C;
+        }
+        .value {
+          font-size: 18px;
+        }
+      }
+
+      .handicap-number .value, .line .value {
+        font-size: 14px;
+      }
+
+    }
+
+    .team-info {
+      position: relative;
+      top: -4px;
+
+      .name {
+        font-family: $font-family-nhg-disp;
+        font-weight: $font-weight-nhg-disp-45-light;
+        font-size: 22px;
+      }
+
+      &.home {
+        .name {
+          text-align: right;
+        }
+      }
+    }
+  }
+}
