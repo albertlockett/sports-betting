@@ -10,7 +10,7 @@ export const GET_GAME_LIST_FUNCTION = gql`
             bool: {
               must: [
                 { term: { Time: { value: $date } } }
-                { term: { LatestCollected: { value: false } } }
+                { term: { LatestCollected: { value: true } } }
               ]
             }
           }

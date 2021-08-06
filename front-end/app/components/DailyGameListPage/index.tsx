@@ -5,6 +5,7 @@ import moment from "moment";
 import Game from "./components/Game";
 
 import { GET_GAME_LIST_FUNCTION } from "./queries";
+import { pairGames } from "./utils";
 import { selectHits } from "../../util/selectors";
 
 import "./styles.scss";
@@ -22,13 +23,18 @@ export default function DailyGameListPage(): JSX.Element {
     return <h1>Error {error}</h1>;
   }
 
-  const hits = selectHits(data);
+  const hits = selectHits(data).map(({ _source }) => _source);
 
-  console.log({ data, loading, error, hits });
+  const gamePairs = pairGames(hits);
+  console.log({ gamePairs })
+
   return (
     <div className="daily-game-list">
-      {hits.map((hit: any) => {
-        return <Game id={hit._id} game={hit._source} />;
+      {gamePairs.map((gamePair) => {
+        const key = gamePair.home.AwayTeam + gamePair.home.HomeTeam;
+        return (
+          <Game key={key} homeGame={gamePair.home} awayGame={gamePair.away} />
+        );
       })}
     </div>
   );

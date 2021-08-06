@@ -29,8 +29,15 @@ type Handicap struct {
   Source          string
 }
 
+func (h Handicap) ComputeEventId() string {
+  stringVal := fmt.Sprintf("%s%s%s%s", h.Side, h.HomeTeam, h.AwayTeam, h.Time.Format(time.RFC3339))
+  hasher := sha1.New()
+  hasher.Write([]byte(stringVal))
+  return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}
+
 func (h Handicap) ComputeId() string {
-  stringVal := fmt.Sprintf("%s%s%s%s%s", h.Side, h.HomeTeam, h.AwayTeam, h.Time.Format(time.RFC3339), h.TimeCollected.Format(time.RFC3339))
+  stringVal := fmt.Sprintf("%s%s", h.ComputeEventId(), h.TimeCollected.Format(time.RFC3339))
   hasher := sha1.New()
   hasher.Write([]byte(stringVal))
   return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
@@ -47,8 +54,15 @@ type Line struct {
   Type            string
 }
 
+func (l Line) ComputeEventId() string {
+  stringVal := fmt.Sprintf("%s%s%s%s", l.Side, l.HomeTeam, l.AwayTeam, l.Time.Format(time.RFC3339))
+  hasher := sha1.New()
+  hasher.Write([]byte(stringVal))
+  return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}
+
 func (l Line) ComputeId() string {
-  stringVal := fmt.Sprintf("%s%s%s%s%s", l.Side, l.HomeTeam, l.AwayTeam, l.Time.Format(time.RFC3339), l.TimeCollected.Format(time.RFC3339))
+  stringVal := fmt.Sprintf("%s%s", l.ComputeEventId(), l.TimeCollected.Format(time.RFC3339))
   hasher := sha1.New()
   hasher.Write([]byte(stringVal))
   return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
@@ -63,8 +77,15 @@ type ExpectedValue struct {
   ExpectedValue   float64
 }
 
+func (e ExpectedValue) ComputeEventId() string {
+  stringVal := fmt.Sprintf("%s%s%s%s%s", e.Line.Side, e.HomeTeam, e.AwayTeam, e.Time.Format(time.RFC3339), e.Handicap.TimeCollected.Format(time.RFC3339))
+  hasher := sha1.New()
+  hasher.Write([]byte(stringVal))
+  return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}
+
 func (e ExpectedValue) ComputeId() string {
-  stringVal := fmt.Sprintf("%s%s%s%s%s%s", e.Line.Side, e.HomeTeam, e.AwayTeam, e.Time.Format(time.RFC3339), e.Handicap.TimeCollected.Format(time.RFC3339), e.Line.TimeCollected.Format(time.RFC3339))
+  stringVal := fmt.Sprintf("%s%s", e.Line.Side, e.HomeTeam, e.AwayTeam, e.Time.Format(time.RFC3339), e.Handicap.TimeCollected.Format(time.RFC3339), e.Line.TimeCollected.Format(time.RFC3339))
   hasher := sha1.New()
   hasher.Write([]byte(stringVal))
   return base64.URLEncoding.EncodeToString(hasher.Sum(nil))

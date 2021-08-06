@@ -6,11 +6,9 @@ type teamInfoProps = {
   side: string;
 };
 
-interface NameMap {
+const NAME_FOR_CODE: {
   [name: string]: string;
-}
-
-const NAME_FOR_CODE: NameMap = {
+} = {
   BAL: "Baltimore Orioles",
   BOS: "Boston Red Sox",
   NYY: "New York Yankees",
