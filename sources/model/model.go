@@ -22,6 +22,7 @@ type Event struct {
 
 type Handicap struct {
   Event
+  EventId         string
   TimeCollected   time.Time
   LatestCollected bool
   Odds            float64
@@ -45,6 +46,7 @@ func (h Handicap) ComputeId() string {
 
 type Line struct {
   Event
+  EventId         string
   TimeCollected   time.Time
   LatestCollected bool
   LineAmerican    int32
@@ -72,20 +74,22 @@ type ExpectedValue struct {
   Event
   Handicap
   Line
+  EventId         string
   LatestCollected bool
+  TimeComputed    time.Time
   Side            string
   ExpectedValue   float64
 }
 
 func (e ExpectedValue) ComputeEventId() string {
-  stringVal := fmt.Sprintf("%s%s%s%s%s", e.Line.Side, e.HomeTeam, e.AwayTeam, e.Time.Format(time.RFC3339), e.Handicap.TimeCollected.Format(time.RFC3339))
+  stringVal := fmt.Sprintf("%s%s%s%s", e.Line.Side, e.HomeTeam, e.AwayTeam, e.Time.Format(time.RFC3339))
   hasher := sha1.New()
   hasher.Write([]byte(stringVal))
   return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 }
 
 func (e ExpectedValue) ComputeId() string {
-  stringVal := fmt.Sprintf("%s%s", e.Line.Side, e.HomeTeam, e.AwayTeam, e.Time.Format(time.RFC3339), e.Handicap.TimeCollected.Format(time.RFC3339), e.Line.TimeCollected.Format(time.RFC3339))
+  stringVal := fmt.Sprintf("%s%s", e.ComputeEventId(), e.TimeComputed.Format(time.RFC3339))
   hasher := sha1.New()
   hasher.Write([]byte(stringVal))
   return base64.URLEncoding.EncodeToString(hasher.Sum(nil))

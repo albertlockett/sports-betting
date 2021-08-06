@@ -26,7 +26,6 @@ export default function DailyGameListPage(): JSX.Element {
   const hits = selectHits(data).map(({ _source }) => _source);
 
   const gamePairs = pairGames(hits);
-  console.log({ gamePairs })
 
   return (
     <div className="daily-game-list">

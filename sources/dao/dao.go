@@ -12,6 +12,7 @@ import (
   "log"
   "sort"
   "strings"
+  "time"
 )
 
 const IDX_HANDICAP = "handicaps"
@@ -116,33 +117,48 @@ func saveRecord(index string, id string, document []byte) error {
   return nil
 }
 
-func ResetLineLatestCollected() error {
-  return resetLatestCollectedFlag(IDX_LINES)
+func ResetLineLatestCollected(eventId string) error {
+  return resetLatestCollectedFlag(IDX_LINES, eventId)
 }
 
-func ResetHandicapLatestCollected() error {
-  return resetLatestCollectedFlag(IDX_HANDICAP)
+func ResetHandicapLatestCollected(eventId string) error {
+  return resetLatestCollectedFlag(IDX_HANDICAP, eventId)
 }
 
-func ResetExpectedValueLatestCollected() error {
-  return resetLatestCollectedFlag(IDX_EXPECTED_VALUES)
+func ResetExpectedValueLatestCollected(eventId string) error {
+  return resetLatestCollectedFlag(IDX_EXPECTED_VALUES, eventId)
 }
 
-func resetLatestCollectedFlag(index string) error {
-  req := esapi.UpdateByQueryRequest{
-    Index: []string{index},
-    Body: strings.NewReader(`{
+func resetLatestCollectedFlag(index string, eventId string) error {
+  bodyText := fmt.Sprintf(`{
       "size": 1000,
       "query":{
-        "term":{
-          "LatestCollected":{"value":"true"}
+        "bool": {
+          "must": [
+            {
+              "term":{
+                "LatestCollected":{"value":"true"}
+              }
+            },
+            {
+              "term": {
+                "EventId.keyword": { "value": "%s" }
+              }
+            }
+          ]
         }
       },
       "script":{
         "source": "ctx._source.LatestCollected = false",
         "lang": "painless"
       }
-    }`),
+    }`, eventId)
+  fmt.Println(bodyText)
+
+  req := esapi.UpdateByQueryRequest{
+    Index: []string{index},
+    Body:  strings.NewReader(bodyText),
+    Conflicts: "proceed",
   }
 
   res, err := req.Do(context.Background(), local.client)
@@ -257,6 +273,7 @@ func FetchEvents() ([]*model.ExpectedValue, error) {
         LatestCollected: true,
         Side:            line.Side,
         ExpectedValue:   handicap.Odds * line.LineDecimal,
+        TimeComputed:    time.Now(),
       }
       results = append(results, &ev)
     }
