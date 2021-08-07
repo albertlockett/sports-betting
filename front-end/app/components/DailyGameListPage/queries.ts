@@ -5,6 +5,7 @@ export const GET_GAME_LIST_FUNCTION = gql`
     elastic7 {
       search(
         index: "expected-values"
+        size: 1000
         body: {
           query: {
             bool: {

@@ -13,12 +13,19 @@ export function pairGames(games: ExpectedValue[]): ExpectedValuePair[] {
       [_: string]: ExpectedValue[];
     }
   );
-  return Object.values(pairs).map((games) => {
-    const [game1, game2] = games;
-    if (game1.Side === "home") {
-      return { home: game1, away: game2 };
-    } else {
-      return { home: game2, away: game1 };
-    }
-  });
+
+  return Object.values(pairs)
+    .map((games) => {
+      const [game1, game2] = games;
+      if (game1.Side === "home") {
+        return { home: game1, away: game2 };
+      } else {
+        return { home: game2, away: game1 };
+      }
+    })
+    .sort(({ home: home1, away: away1 }, { home: home2, away: away2 }) => {
+      const best1 = Math.max(home1.ExpectedValue, away1.ExpectedValue);
+      const best2 = Math.max(home2.ExpectedValue, away2.ExpectedValue);
+      return best2 - best1;
+    });
 }
