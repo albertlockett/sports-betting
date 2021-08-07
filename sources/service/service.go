@@ -16,14 +16,13 @@ type reqBody struct {
   Time            string
 }
 
-func queryFromBody(req *http.Request) (*dao.Query, error) {
+func queryFromBody(req *http.Request) (dao.Query, error) {
   bodyBytes, err := ioutil.ReadAll(req.Body)
   if err != nil {
     return nil, err
   }
   if len(bodyBytes) == 0 {
-    var query dao.Query = dao.MatchAllQuery{}
-    return &query, nil
+    return &dao.MatchAllQuery{}, nil
   }
 
   rb := reqBody{}
@@ -31,19 +30,19 @@ func queryFromBody(req *http.Request) (*dao.Query, error) {
     return nil, err
   }
 
-  queries := make([]*dao.Query, 0)
+  queries := make([]dao.Query, 0)
   if rb.LatestCollected {
-    var query dao.Query = dao.TermQuery{
-      Field: "LatestCollected",
-      Value: true,
-    }
-    queries = append(queries, &query)
+    queries = append(queries, dao.TermQuery{Field: "LatestCollected", Value: true,})
+  }
+
+  if rb.Time != "" {
+    queries = append(queries, dao.TermQuery{Field: "Time", Value: rb.Time})
   }
 
   var query dao.Query = dao.BoolQuery{
     Must: queries,
   }
-  return &query, nil
+  return query, nil
 }
 
 func sendErrorResponse(w http.ResponseWriter) {
@@ -51,7 +50,7 @@ func sendErrorResponse(w http.ResponseWriter) {
   w.Write([]byte(`{ "error": "Internal Server Error" }`))
 }
 
-func getHandicaps(w http.ResponseWriter, r *http.Request) {
+func getExpectedValues(w http.ResponseWriter, r *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
   query, err := queryFromBody(r)
@@ -60,7 +59,7 @@ func getHandicaps(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  results, err := dao.SearchHandicaps(&dao.SearchRequestBody{Query: query})
+  results, err := dao.SearchExpectedValues(&dao.SearchRequestBody{Query: query})
   if err != nil {
     sendErrorResponse(w)
     return
@@ -83,6 +82,6 @@ func main() {
     panic(err)
   }
   r := mux.NewRouter()
-  r.HandleFunc("/handicaps", getHandicaps).Methods("GET")
+  r.HandleFunc("/expected-values", getExpectedValues).Methods("POST")
   log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", config.Local.Port), r))
 }

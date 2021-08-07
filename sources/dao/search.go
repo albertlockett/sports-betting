@@ -14,20 +14,19 @@ type Query interface {
 }
 
 type BoolQuery struct {
-  Must []*Query
+  Must []Query
 }
 
 func (t BoolQuery) Build() (map[string]interface{}, error) {
   mb := make([]map[string]interface{}, 0)
   for _, m := range t.Must {
-    if b, err := (*m).Build(); err != nil {
+    if b, err := m.Build(); err != nil {
       return nil, err
     } else {
       mb = append(mb, b)
     }
   }
-
-
+  
   return map[string]interface{}{
     "bool": map[string]interface{}{
       "must": mb,
@@ -60,11 +59,11 @@ func (m MatchAllQuery) Build() (map[string]interface{}, error) {
 
 type SearchRequestBody struct {
   Size  int64
-  Query *Query
+  Query Query
 }
 
-func stringifyQuery(query *Query) ([]byte, error) {
-  data, err := (*query).Build()
+func stringifyQuery(query Query) ([]byte, error) {
+  data, err := query.Build()
   if err != nil {
     return nil, err
   }
@@ -99,29 +98,27 @@ func Search(index string, search *SearchRequestBody) (*esapi.Response, error) {
   return res, nil
 }
 
-func SearchHandicaps(search *SearchRequestBody) ([]*model.Handicap, error) {
-  type fetchHandicapsResults struct {
-    Hits struct {
-      Hits []struct {
-        Source model.Handicap `json:"_source"`
-      }
-    }
-  }
-
-  res, err := Search(IDX_HANDICAP, search)
+func SearchExpectedValues(search *SearchRequestBody) ([]*model.ExpectedValue, error) {
+  res, err := Search(IDX_EXPECTED_VALUES, search)
   if err != nil {
     return nil, err
   }
 
-  resBody := fetchHandicapsResults{}
+  resBody := struct {
+    Hits struct {
+      Hits []struct {
+        Source model.ExpectedValue `json:"_source"`
+      }
+    }
+  }{}
   if err := json.NewDecoder(res.Body).Decode(&resBody); err != nil {
     return nil, err
   }
 
-  handicaps := make([]*model.Handicap, 0)
+  evs := make([]*model.ExpectedValue, 0)
   for _, result := range resBody.Hits.Hits {
-    handicaps = append(handicaps, &result.Source)
+    evs = append(evs, &result.Source)
   }
 
-  return handicaps, nil
+  return evs, nil
 }
