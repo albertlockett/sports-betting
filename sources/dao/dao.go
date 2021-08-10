@@ -18,6 +18,7 @@ import (
 const IDX_HANDICAP = "handicaps"
 const IDX_LINES = "lines"
 const IDX_EXPECTED_VALUES = "expected-values"
+const IDX_DAILY_SUMMARY = "daily-summaries"
 
 type dao struct {
   client *elasticsearch.Client
@@ -69,6 +70,14 @@ func testConnection() error {
   log.Println("Connection success")
 
   return nil
+}
+
+func SaveDailyValue(d *model.DailySummary) error {
+  document, err := json.Marshal(d)
+  if err != nil {
+    return err
+  }
+  return saveRecord(IDX_DAILY_SUMMARY, d.ComputeId(), document)
 }
 
 func SaveExpectedValue(ev *model.ExpectedValue) error {
@@ -156,8 +165,8 @@ func resetLatestCollectedFlag(index string, eventId string) error {
   fmt.Println(bodyText)
 
   req := esapi.UpdateByQueryRequest{
-    Index: []string{index},
-    Body:  strings.NewReader(bodyText),
+    Index:     []string{index},
+    Body:      strings.NewReader(bodyText),
     Conflicts: "proceed",
   }
 

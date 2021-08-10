@@ -16,6 +16,8 @@ type reqBody struct {
   Time            string
 }
 
+const ERR = `{ "error": "Internal Server Error" }`
+
 func queryFromBody(req *http.Request) (dao.Query, error) {
   bodyBytes, err := ioutil.ReadAll(req.Body)
   if err != nil {
@@ -45,29 +47,48 @@ func queryFromBody(req *http.Request) (dao.Query, error) {
   return query, nil
 }
 
-func sendErrorResponse(w http.ResponseWriter) {
-  w.WriteHeader(500)
-  w.Write([]byte(`{ "error": "Internal Server Error" }`))
-}
-
 func getExpectedValues(w http.ResponseWriter, r *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
   query, err := queryFromBody(r)
   if err != nil {
-    sendErrorResponse(w)
+    http.Error(w, ERR, http.StatusNotFound)
     return
   }
 
   results, err := dao.SearchExpectedValues(&dao.SearchRequestBody{Query: query})
   if err != nil {
-    sendErrorResponse(w)
+    http.Error(w, ERR, http.StatusNotFound)
     return
   }
 
   bytes, err := json.Marshal(results)
   if err != nil {
-    sendErrorResponse(w)
+    http.Error(w, ERR, http.StatusNotFound)
+    return
+  }
+
+  w.Write(bytes)
+}
+
+func getDailySummaries(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set("Content-Type", "application/json")
+
+  query, err := queryFromBody(r)
+  if err != nil {
+    http.Error(w, ERR, http.StatusNotFound)
+    return
+  }
+
+  results, err := dao.SearchDailySumamrys(&dao.SearchRequestBody{Query: query})
+  if err != nil {
+    http.Error(w, ERR, http.StatusNotFound)
+    return
+  }
+
+  bytes, err := json.Marshal(results)
+  if err != nil {
+    http.Error(w, ERR, http.StatusNotFound)
     return
   }
 
@@ -83,5 +104,6 @@ func main() {
   }
   r := mux.NewRouter()
   r.HandleFunc("/expected-values", getExpectedValues).Methods("POST")
+  r.HandleFunc("/daily-summaries", getDailySummaries).Methods("POST")
   log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", config.Local.Port), r))
 }

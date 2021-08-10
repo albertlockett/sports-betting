@@ -5,6 +5,7 @@ import (
   "github.com/albertlockett/sports-betting/sources/betdsi"
   "github.com/albertlockett/sports-betting/sources/config"
   "github.com/albertlockett/sports-betting/sources/dao"
+  "github.com/albertlockett/sports-betting/sources/engine"
   "github.com/albertlockett/sports-betting/sources/fivethirtyeight"
   "log"
   "os"
@@ -26,6 +27,8 @@ func main() {
     fetchHandicaps()
   case "lines":
     fetchLines()
+  case "daily-games":
+    fetchDailySummarys()
   }
 }
 
@@ -80,5 +83,15 @@ func fetchExpectedValues() {
     if err := dao.SaveExpectedValue(result); err != nil {
       panic(err)
     }
+  }
+}
+
+func fetchDailySummarys () {
+  ds, err := engine.CalculateDailySummary()
+  if err != nil {
+    panic(err)
+  }
+  if err = dao.SaveDailyValue(ds); err != nil {
+    panic(err)
   }
 }

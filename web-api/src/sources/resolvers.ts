@@ -1,13 +1,14 @@
 import _ from "lodash";
 import fetch from "node-fetch";
 
-export async function fetchExpectedValues(
-  context: any,
-  args: { input?: any },
-  info: any
-): Promise<any[]> {
+const ENDPOINT = "http://localhost:8080/";
+
+async function fetchThingFromEndpoint(
+  indexName: string,
+  args: { input?: any }
+) {
   const input = args?.input;
-  const endpoint = "http://localhost:8080/expected-values";
+  const endpoint = `${ENDPOINT}${indexName}`;
   const response = await fetch(endpoint, {
     method: "POST",
     body: input ? JSON.stringify(input) : undefined,
@@ -19,4 +20,20 @@ export async function fetchExpectedValues(
     })
   );
   return result;
+}
+
+export async function fetchExpectedValues(
+  context: any,
+  args: any,
+  info: any
+): Promise<any[]> {
+  return fetchThingFromEndpoint("expected-values", args);
+}
+
+export async function fetchDailyValues(
+  context: any,
+  args: any,
+  info: any
+): Promise<any[]> {
+  return fetchThingFromEndpoint("daily-summaries", args);
 }

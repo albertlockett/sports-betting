@@ -94,3 +94,15 @@ func (e ExpectedValue) ComputeId() string {
   hasher.Write([]byte(stringVal))
   return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 }
+
+type DailySummary struct {
+  Time     time.Time
+  NumGames uint8
+}
+
+func (d DailySummary) ComputeId() string {
+  stringVal := fmt.Sprintf("%s%s", d.Time.Format(time.RFC3339))
+  hasher := sha1.New()
+  hasher.Write([]byte(stringVal))
+  return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}

@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { fetchExpectedValues } from "./resolvers";
+import { fetchDailyValues, fetchExpectedValues } from "./resolvers";
 
 export const typeDefs = gql`
   type ExpectedValue {
@@ -17,16 +17,23 @@ export const typeDefs = gql`
     timeComputed: String
   }
 
+  type DailySummary {
+    time: String
+    numGames: Int
+  }
+
   input SourcesSearchInput {
     latestCollected: Boolean
     time: String
   }
 
   extend type Query {
+    DailySummary(input: SourcesSearchInput): [DailySummary]
     ExpectedValues(input: SourcesSearchInput): [ExpectedValue]
   }
 `;
 
 export const queries = {
   ExpectedValues: fetchExpectedValues,
+  DailySummary: fetchDailyValues,
 };

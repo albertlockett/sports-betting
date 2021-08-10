@@ -122,3 +122,28 @@ func SearchExpectedValues(search *SearchRequestBody) ([]*model.ExpectedValue, er
 
   return evs, nil
 }
+
+func SearchDailySumamrys(search *SearchRequestBody) ([]*model.DailySummary, error) {
+  res, err := Search(IDX_DAILY_SUMMARY, search)
+  if err != nil {
+    return nil, err
+  }
+
+  resBody := struct {
+    Hits struct {
+      Hits []struct {
+        Source model.DailySummary `json:"_source"`
+      }
+    }
+  }{}
+  if err := json.NewDecoder(res.Body).Decode(&resBody); err != nil {
+    return nil, err
+  }
+
+  evs := make([]*model.DailySummary, 0)
+  for _, result := range resBody.Hits.Hits {
+    evs = append(evs, &result.Source)
+  }
+
+  return evs, nil
+}

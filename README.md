@@ -31,7 +31,7 @@ helm install elasticsearch elastic/elasticsearch -f helm/elasticsearch/values.ya
 
 create indices (port forward first)
 ```
-curl -XPUT localhost:9200/handicaps
-curl -XPUT localhost:9200/lines
-curl -XPUT localhost:9200/expected-values
+    curl -XPUT localhost:9200/handicaps
+    curl -XPUT localhost:9200/lines
+    curl -XPUT localhost:9200/expected-values
 ```
