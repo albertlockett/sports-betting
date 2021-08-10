@@ -1,0 +1,22 @@
+@import "../../theme.scss";
+
+$width-of-day: 14.285714285714285%; // 1/7
+
+.week-row {
+  display: grid;
+  grid-template-columns: $width-of-day $width-of-day $width-of-day $width-of-day $width-of-day $width-of-day $width-of-day;
+}
+
+.cal-header {
+  border-top: 1px solid $gray-light;
+  border-bottom: 1px solid $gray-light;
+  font-family:  $font-family-ocr;
+  margin-top: 8px;
+  > .week-row {
+    > div {
+      padding: 8px 0px;
+      text-transform: lowercase;
+    }
+  }
+
+}
