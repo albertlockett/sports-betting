@@ -116,8 +116,9 @@ func SearchExpectedValues(search *SearchRequestBody) ([]*model.ExpectedValue, er
   }
 
   evs := make([]*model.ExpectedValue, 0)
-  for _, result := range resBody.Hits.Hits {
-    evs = append(evs, &result.Source)
+  for i, _ := range resBody.Hits.Hits {
+    //evs = append(evs, &result.Source)
+    evs = append(evs, &resBody.Hits.Hits[i].Source)
   }
 
   return evs, nil
@@ -141,8 +142,8 @@ func SearchDailySumamrys(search *SearchRequestBody) ([]*model.DailySummary, erro
   }
 
   evs := make([]*model.DailySummary, 0)
-  for _, result := range resBody.Hits.Hits {
-    evs = append(evs, &result.Source)
+  for i, _ := range resBody.Hits.Hits {
+    evs = append(evs, &resBody.Hits.Hits[i].Source)
   }
 
   return evs, nil

@@ -23,10 +23,11 @@ export default function DailyGameListPage(): JSX.Element {
     return <h1>Error {error}</h1>;
   }
 
-  const hits = selectHits(data).map(({ _source }) => _source);
+  const hits = selectHits(data);
+  console.log({ hits })
 
   const gamePairs = pairGames(hits);
-  console.log({ gamePairs })
+  console.log({ gamePairs });
 
   return (
     <div className="daily-game-list">
@@ -39,3 +40,4 @@ export default function DailyGameListPage(): JSX.Element {
     </div>
   );
 }
+

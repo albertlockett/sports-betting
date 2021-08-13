@@ -1,22 +1,20 @@
 import { gql } from "@apollo/client";
 
 export const GET_GAME_LIST_FUNCTION = gql`
-  query get_daily_games($date: String) {
-    elastic7 {
-      search(
-        index: "expected-values"
-        size: 1000
-        body: {
-          query: {
-            bool: {
-              must: [
-                { term: { Time: { value: $date } } }
-                { term: { LatestCollected: { value: true } } }
-              ]
-            }
-          }
-        }
-      )
+  query expected_vals($time: String) {
+    ExpectedValues(input: { time: $time }) {
+      HomeTeam: homeTeam
+      AwayTeam: awayTeam
+      Time: time
+      Odds: odds
+      LineAmerican: lineAmerican
+      LineDecimal: lineDecimal
+      ExpectedValue: expectedValue
+      Type: type
+      EventId: eventId
+      latestCollected: latestCollected
+      Side: side
+      TimeComputed: timeComputed
     }
   }
 `;
