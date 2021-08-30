@@ -6,3 +6,6 @@ build:
 
 docker:
 	docker build -t sports-betting:latest .
+
+docker-service:
+	docker build -f Dockerfile-service -t sports-betting-service:latest .

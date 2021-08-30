@@ -24,7 +24,6 @@ export default function DailyGameListPage(): JSX.Element {
   }
 
   const hits = selectHits(data);
-  console.log({ hits })
 
   const gamePairs = pairGames(hits);
   console.log({ gamePairs });
@@ -40,4 +39,3 @@ export default function DailyGameListPage(): JSX.Element {
     </div>
   );
 }
-

@@ -8,6 +8,7 @@ It's build using GCP cloud build
 log into gcp
 ```
 gcloud auth application-default login
+gcloud config set project <my project>
 ```
 
 setup k8s cluster
@@ -35,3 +36,5 @@ create indices (port forward first)
     curl -XPUT localhost:9200/lines
     curl -XPUT localhost:9200/expected-values
 ```
+
+apply all the cronjobs from the k8s dir
