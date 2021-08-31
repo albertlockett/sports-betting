@@ -1,8 +1,9 @@
 FROM node:16-alpine3.14 AS build
+ARG ENDPOINT
+ENV ENDPOINT=$ENDPOINT
 RUN apk add make
 RUN apk add g++
 RUN npm install -g npm@7.21.1
-
 RUN apk add --no-cache python3 py3-pip
 WORKDIR /fuck
 COPY . ./
