@@ -10,5 +10,6 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --only=production
 COPY --from=build /usr/src/app/build ./build
+COPY ./static ./
 EXPOSE 4000
 CMD npm start
