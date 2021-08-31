@@ -19,10 +19,8 @@ spec:
         image: gcr.io/albertlockett-test2/sports-betting-service:latest
         imagePullPolicy: Always
         env:
-        - name: CFG_ES_URL
-          value: http://elasticsearch-master:9200
-        - name: CFG_PORT
-          value: "8080"
+        - name: ENDPOINT
+          value: http://sources-service
 ---
 apiVersion: v1
 kind: Service

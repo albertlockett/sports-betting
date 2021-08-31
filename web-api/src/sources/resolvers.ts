@@ -1,7 +1,8 @@
 import _ from "lodash";
 import fetch from "node-fetch";
+import config from "../config";
 
-const ENDPOINT = "http://localhost:8080/";
+const ENDPOINT = config.endpoint;
 
 async function fetchThingFromEndpoint(
   indexName: string,
