@@ -10,6 +10,6 @@ steps:
     args: ['push', 'gcr.io/albertlockett-test2/sports-betting-service:latest']
   
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-f', './sources/Dockerfile', '-t', 'gcr.io/albertlockett-test2/sports-betting-web-api:latest', './sources']
+    args: ['build', '-f', './web-api/Dockerfile', '-t', 'gcr.io/albertlockett-test2/sports-betting-web-api:latest', './sources']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/albertlockett-test2/sports-betting-web-api:latest']

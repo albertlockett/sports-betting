@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sources-service
+  name: web-api
   labels:
-    app: sources-service
+    app: web-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sources-service
+      app: web-api
   template:
     metadata:
       labels:
-        app: sources-service
+        app: web-api
     spec:
       containers:
       - name: sources-service
-        image: gcr.io/albertlockett-test2/sports-betting-service:latest
+        image: gcr.io/albertlockett-test2/sports-betting-web-api:latest
         imagePullPolicy: Always
         env:
         - name: ENDPOINT
@@ -25,10 +25,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sources-service
+  name: web-api
 spec:
   selector:
-    app: sources-service
+    app: web-api
   ports:
   - protocol: TCP
     port: 80
