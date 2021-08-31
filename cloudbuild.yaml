@@ -1,7 +1,7 @@
 steps:
   # frontend
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['source ./build_frontend.sh']
+    args: ['source', './build_frontend.sh']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/albertlockett-test2/sports-betting-front-end:latest']
 
