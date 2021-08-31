@@ -1,10 +1,9 @@
 steps:
   # frontend
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['run', './build_frontend.sh']
+    args: ['build', '-f', './sources/Dockerfile', '-t', 'gcr.io/albertlockett-test2/sports-betting-front-end:latest', './front-end']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/albertlockett-test2/sports-betting-front-end:latest']
-
   #cronjobs
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-f', './sources/Dockerfile', '-t', 'gcr.io/albertlockett-test2/sports-betting:latest', './sources']
