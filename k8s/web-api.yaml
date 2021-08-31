@@ -20,7 +20,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: ENDPOINT
-          value: http://sources-service
+          value: http://sources-service/
 ---
 apiVersion: v1
 kind: Service

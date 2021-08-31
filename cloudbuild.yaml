@@ -1,15 +1,25 @@
 steps:
+  # frontend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['./build_frontend.sh']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/albertlockett-test2/sports-betting-front-end:latest']
+
+  #cronjobs
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-f', './sources/Dockerfile', '-t', 'gcr.io/albertlockett-test2/sports-betting:latest', './sources']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/albertlockett-test2/sports-betting:latest']
   
+  # service
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-f', './sources/Dockerfile-service', '-t', 'gcr.io/albertlockett-test2/sports-betting-service:latest', './sources']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/albertlockett-test2/sports-betting-service:latest']
   
+  # web api
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-f', './web-api/Dockerfile', '-t', 'gcr.io/albertlockett-test2/sports-betting-web-api:latest', './web-api']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/albertlockett-test2/sports-betting-web-api:latest']
+  
