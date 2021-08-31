@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sources-service
+  labels:
+    app: sources-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sources-service
+  template:
+    metadata:
+      labels:
+        app: sources-service
+    spec:
+      containers:
+      - name: sources-service
+        image: gcr.io/albertlockett-test2/sports-betting-service:latest
+        imagePullPolicy: Always
+        env:
+        - name: CFG_ES_URL
+          value: http://elasticsearch-master:9200
+        - name: CFG_PORT
+          value: "8080"
