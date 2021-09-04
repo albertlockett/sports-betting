@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "parcel build app/static/index.html",
+    "serve": "node server/",
     "start:dev": "parcel app/static/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,11 +27,13 @@
   "dependencies": {
     "@apollo/client": "3.4.3",
     "classnames": "2.3.1",
+    "express": "4.17.1",
     "graphql": "15.5.1",
     "moment": "2.29.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "5.2.0",
-    "reselect": "4.0.0"
+    "reselect": "4.0.0",
+    "serve": "12.0.0"
   }
 }
