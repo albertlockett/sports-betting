@@ -37,4 +37,4 @@ create indices (port forward first)
     curl -XPUT localhost:9200/expected-values
 ```
 
-apply all the cronjobs from the k8s dir
+apply all the manifests from the k8s dir
